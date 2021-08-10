@@ -17,8 +17,10 @@ DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
 # map_dict = dict(input().split() for _ in range(int(map_size)))
 # print(map_dict)
 
-map_dict = {'Department1': 'test-product1-dept1-group@example.com', 
-            'Department2': 'test-product1-dept2-group@example.com'}
+map_dict={ 'Product1': {'Department1': 'test-product1-dept1-group@example.com', 
+                       'Department2': 'test-product1-dept2-group@example.com'},
+          'Product2': {'Department1': 'test-product2-dept1-group@example.com', 
+                       'Department2': 'test-product2-dept2-group@example.com'}}
 
 def search(query):
     result = []
@@ -53,9 +55,10 @@ parent_id = input("\n\nEnter Id. of Root Folder : ")
 search_results = search(query=f"mimeType='{FOLDER_MIME}' and '{parent_id}' in parents"  )
 for search_result in search_results:
     print(search_result[0], search_result[1])
-    rec_search_results = search(query=f"mimeType='{FOLDER_MIME}' and '{search_result[0]}' in parents"  )
-    for rec_search_result in rec_search_results:
-        print("\t|------ "+rec_search_result[0], rec_search_result[1])
-        if  rec_search_result[1] in map_dict:
-            add_user(rec_search_result[0], map_dict[rec_search_result[1]])
-            print("\t\taccess given to : "+map_dict[rec_search_result[1]])
+    if(search_result[1] in map_dict):
+        rec_search_results = search(query=f"mimeType='{FOLDER_MIME}' and '{search_result[0]}' in parents"  )
+        for rec_search_result in rec_search_results:
+            print("\t|------ "+rec_search_result[0], rec_search_result[1])
+            if  rec_search_result[1] in map_dict[search_result[1]]:
+                add_user(rec_search_result[0], map_dict[search_result[1]][rec_search_result[1]])
+                print("\t\taccess given to : "+map_dict[search_result[1]][rec_search_result[1]])
